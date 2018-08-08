@@ -7,25 +7,48 @@ import java.awt.*;
 public class assignment_2 extends GraphicsProgram{
 	
 	//define constants
-	private static final double HEAD_WIDTH = 20.0;
-	private static final double HEAD_HEIGHT = 20.0;
-	private static final double CANVAS_WIDTH = 500;
-	private static final double CANVAS_HEIGHT = 500;
+	private static final double HEADX = 50.0;
+	private static final double HEADY = 50.0;
+	private static final double HEAD_WIDTH = 200.0;
+	private static final double HEAD_HEIGHT = 300.0;
+	private static final double EYE_SIZE = 10.0;
+	private static final double MOUTH_WIDTH = 100.0;
+	private static final double MOUTH_HEIGHT = 50.0;
+	
+	//private static final double CANVAS_WIDTH = 500;
+	//private static final double CANVAS_HEIGHT = 500;
 	
 	public void run(){
-		// TODO Auto-generated method stub
+
 		//FIBONACCI PART
-		//System.out.println("curFib");
-		//sequentialFib(1000);
+		System.out.println("curFib");
+		sequentialFib(1000);
 		//END FIBONACCI PART
+		//addHead
+		GRect head = drawHead();
+		add( head );
 		
-		//CANVAS PART
-		int canvasHeight = getHeight();
-		int canvasWidth = getWidth();
+		//get head information
+		double quarterHeadWide = HEAD_WIDTH / 4;
+		double quarterHeadTall = HEAD_HEIGHT / 4;
 		
-		add( drawHead(canvasWidth, canvasHeight) );
-		//add eye balls
-		GOval leftEye = makeCircle( )
+		//add eyes
+		double leftX = HEADX + quarterHeadWide;
+		double rightX = HEADX + ( 3 * quarterHeadWide );
+		double eyeY = HEADY + quarterHeadTall;
+		GOval leftEye = makeEye(leftX, eyeY, EYE_SIZE);
+		add( leftEye );
+		GOval rightEye = makeEye(rightX, eyeY, EYE_SIZE);
+		add(rightEye);
+		
+		//addmouth
+		double mouthX = HEADX + (2 * quarterHeadWide) - (MOUTH_WIDTH / 2);
+		double mouthY = HEADY + (3 * quarterHeadTall) - (MOUTH_HEIGHT / 2);
+		GRect mouth = new GRect(mouthX, mouthY, MOUTH_WIDTH, MOUTH_HEIGHT);
+		mouth.setFillColor(Color.WHITE);
+		mouth.setFilled(true);
+		add( mouth );
+		
 	}
 	
 //	public static void main(String[] args) {
@@ -110,10 +133,10 @@ public class assignment_2 extends GraphicsProgram{
 	 * 
 	 * 
 	 */
-	private static GRect drawHead(int canvasWidth, int canvasHeight){
+	private static GRect drawHead(){
 		
 		//make grect
-		GRect robotHead = new GRect(HEAD_WIDTH, HEAD_HEIGHT, canvasWidth/2 , canvasHeight/2 );
+		GRect robotHead = new GRect(HEADX, HEADY, HEAD_WIDTH, HEAD_HEIGHT);
 		//set fill color
 		robotHead.setFillColor(Color.GRAY);
 		//need to set filled
@@ -121,9 +144,27 @@ public class assignment_2 extends GraphicsProgram{
 		return robotHead;
 		
 	}
+	/*
+	 * makeEye()
+	 * compartment for making an eye
+	 */
+	private static GOval makeEye(double x, double y, double size){
+		return( makeCenterCircle(x, y , size , Color.YELLOW) );
+	}
 	
-	private static GOval makeCircle(double radius, Color col){
-		GOval curCircle = new GOval( radius, radius);
+	/*
+	 * makeCircle
+	 * given the location, a radius, and a color, make the object and return it
+	 * @inputs: 
+	 * 		double x : x location
+	 * 		double y : y location
+	 * 		double radius
+	 * 		Color col: color of object
+	 */
+	private static GOval makeCenterCircle(double x, double y, double radius, Color col){
+		x -= radius;
+		y -= radius;
+		GOval curCircle = new GOval( x, y , 2*radius, 2*radius);
 		//asert that col is a color
 		if( !( col == null) ) {
 			curCircle.setFillColor(col);
