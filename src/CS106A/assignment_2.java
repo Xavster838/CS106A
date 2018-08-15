@@ -22,7 +22,7 @@ public class assignment_2 extends GraphicsProgram{
 
 		//FIBONACCI PART
 		System.out.println("curFib");
-		sequentialFib(1000);
+		sequentialFib(20);
 		//END FIBONACCI PART
 		//addHead
 		GRect head = drawHead();
@@ -77,11 +77,6 @@ public class assignment_2 extends GraphicsProgram{
 		for( int i = 2; i < limit ; i++){
 			//increase curFib by value of i - 1
 			int curFib = lastFib + lastLastFib;
-			//don't exceed 10000
-			if(curFib > 10000){
-				System.out.println("exceeding limit: 10000. Breaking");
-				break;
-			}
 			//print curFib
 			System.out.println(curFib);
 			//assign new values
