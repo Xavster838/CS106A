@@ -5,6 +5,7 @@ import acm.graphics.*; //graphics packages to get graphics objects
 import acm.program.*; // program packages to create a Graphics program
 import acm.util.*;	 // util for random Generator
 import java.awt.*;   // get Color object
+import java.util.concurrent.TimeUnit;
 
 /**
  * Create a graphics program that generates NUM_BALLS random balls of random size, color and location
@@ -20,8 +21,8 @@ public class randomBalls extends GraphicsProgram {
 	 * 3. MAX_RAD   : max radius of balls
 	 */
 	private static final int NUM_BALLS = 10;
-	private static final int MIN_RAD = 5;
-	private static final int MAX_RAD = 50;
+	private static final int MIN_RAD = 2;
+	private static final int MAX_RAD = 20;
 	
 	/*
 	 * Algorithm:
@@ -30,11 +31,12 @@ public class randomBalls extends GraphicsProgram {
 	
 	public void run(){
 		
-		//get the canvas
-		GCanvas gc = this.getGCanvas();
+		canvasWidth = getWidth();
+		canvasHeight = getHeight();
 		
-		System.out.println("canvas width: " + canvasWidth);
-		System.out.println( "canvas Height: " + canvasHeight);
+		//get sense of the canvas size
+		GRect canvasBorder = new GRect(canvasWidth, canvasHeight);
+		add(canvasBorder);
 		
 		for( int i = 0 ; i < NUM_BALLS ; i++){
 			//get radius
@@ -56,7 +58,6 @@ public class randomBalls extends GraphicsProgram {
 		    add( getBall( xPoint, yPoint, ballSize, col) );
 		}
 		
-		
 	}
 	
 	/*
@@ -76,8 +77,8 @@ public class randomBalls extends GraphicsProgram {
 	 * private instance vars:
 	 */
 	RandomGenerator rgen = RandomGenerator.getInstance(); //look into this because you don't get it
-	int canvasWidth = (this.getGCanvas()).getWidth();
-	int canvasHeight = (this.getGCanvas()).getHeight();
+	int canvasWidth;
+	int canvasHeight;
 	int rightLimit;
 	int bottomLimit;
 	int ballSize;
