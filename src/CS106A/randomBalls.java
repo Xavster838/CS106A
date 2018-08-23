@@ -8,27 +8,23 @@ import java.awt.*;   // get Color object
 import java.util.concurrent.TimeUnit;
 
 /**
- * Create a graphics program that generates NUM_BALLS random balls of random size, color and location
+ * Assignment 3 of Stanford CS106a
+ * Create a graphics program that generates NUM_BALLS 
+ * random balls of random size, color and location of the canvas
  * @author XaviGuitart
  *
+ * issues to resolve: setting bigger canvas size of GraphicsProgram
  */
 public class randomBalls extends GraphicsProgram {
 
-	/*
-	 * constants: 
-	 * 1. NUM_BALLS : total number of balls
-	 * 2. MIN_RAD   : minimum radius of balls
-	 * 3. MAX_RAD   : max radius of balls
-	 */
+	//define constants
 	private static final int NUM_BALLS = 10;
 	private static final int MIN_RAD = 2;
 	private static final int MAX_RAD = 20;
 	
 	/*
-	 * Algorithm:
-	 * 1.) make ball
+	 * main run method. get Width and height of canvas
 	 */
-	
 	public void run(){
 		
 		canvasWidth = getWidth();
@@ -60,8 +56,9 @@ public class randomBalls extends GraphicsProgram {
 		
 	}
 	
-	/*
+	/**
 	 * getBall( radius )
+	 * helper method
 	 * get a ball of size radius and return the ball
 	 */
 	private GOval getBall(double curX, double curY, double curRad, Color curColor){
@@ -79,8 +76,8 @@ public class randomBalls extends GraphicsProgram {
 	RandomGenerator rgen = RandomGenerator.getInstance(); //look into this because you don't get it
 	int canvasWidth;
 	int canvasHeight;
-	int rightLimit;
-	int bottomLimit;
+	int rightLimit; // maximum right most point a ball can be placed
+	int bottomLimit;// bottom most point a ball can be placed
 	int ballSize;
 	int ballDiam;
 }
