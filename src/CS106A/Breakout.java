@@ -83,6 +83,8 @@ import javax.crypto.KeyAgreement;
 		 resize( new Dimension(APPLICATION_WIDTH, APPLICATION_HEIGHT));
 		 setBounds();
 		 setBricks();
+		 setPaddle();
+		 setBall();
 	 }
 	 /**
 	  * setBounds()
@@ -120,10 +122,12 @@ import javax.crypto.KeyAgreement;
 		//loop and a half logic
 		//set brick; increment brick; check brickCount ; add sep
 		int brickInd = 0;
-		int sep = 0;
+		//sum of separations used
+		int sumSep = 0;
 		while(true){
-			//set brick: get x ;  
-			int curX = brickInd * (BRICK_WIDTH) + sep;
+			//set brick: get x ;  add half of brick sep length 
+			//			 to push off of border and set even within border
+			int curX =  BRICK_SEP/2 + brickInd * (BRICK_WIDTH) + sumSep;
 			GRect curBrick = getBrick( curX, curY, curColor);
 			add( curBrick);
 			brickInd++;
@@ -131,7 +135,7 @@ import javax.crypto.KeyAgreement;
 			if(brickInd >= NBRICKS_PER_ROW){
 				break;
 			}
-			sep = brickInd * BRICK_SEP;
+			sumSep = brickInd * BRICK_SEP;
 		}
 	 }
 	 
@@ -175,13 +179,42 @@ import javax.crypto.KeyAgreement;
 		 curBrick.setFilled(true);
 		 return curBrick;
 	 }
-	 
+	 /**
+	  * setPaddle()
+	  * helper function for setupGame
+	  * put paddle in starting position
+	  */
 	 private void setPaddle(){
+		 int padStartY = APPLICATION_HEIGHT - PADDLE_Y_OFFSET;
+		 int padStartX = (APPLICATION_WIDTH - PADDLE_WIDTH) / 2;
+		 paddle = new GRect(padStartX, padStartY, PADDLE_WIDTH, PADDLE_HEIGHT);
+		 paddle.setFillColor(Color.BLACK);
+		 paddle.setFilled(true);
+		 add(paddle);
 		 
 	 }
-	 
+	 /**
+	  * setBall()
+	  * helper function for setupGame
+	  * put ball in starting position
+	  */
 	 private void setBall(){
+		 //get ball start location
+		 int paddleX = (int) paddle.getX();
+		 int paddleY = (int) paddle.getY();
+		 int ballStartX = paddleX + paddleX/2 - BALL_RADIUS;
+		 int ballStartY = paddleY - (2 * BALL_RADIUS);
 		 
+		 ball = new GOval(ballStartX, ballStartY, 2 * BALL_RADIUS, 2 * BALL_RADIUS);
+		 ball.setFillColor(Color.BLACK);
+		 ball.setFilled(true);
+		 
+		 add(ball);
+		 
+		 GOval test = new GOval(paddleX, paddleY, BALL_RADIUS, BALL_RADIUS);
+		 test.setFillColor(Color.RED);
+		 test.setFilled(true);
+		 add(test);
 	 }
 	 
 	 public void keyPressed( KeyEvent e ){
