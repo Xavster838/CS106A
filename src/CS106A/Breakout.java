@@ -202,19 +202,21 @@ import javax.crypto.KeyAgreement;
 		 //get ball start location
 		 int paddleX = (int) paddle.getX();
 		 int paddleY = (int) paddle.getY();
-		 int ballStartX = paddleX + paddleX/2 - BALL_RADIUS;
-		 int ballStartY = paddleY - (2 * BALL_RADIUS);
+		 //get x location of paddle (left most) and add half the width minus ball radius for ball point
+		 //note that you think ball_radius should be ball_diameter: need to see how GOval works
+		 int ballStartX = paddleX + ( (int) paddle.getWidth() )/2 - BALL_RADIUS / 2;
+		 int ballStartY = paddleY - (BALL_RADIUS);
 		 
-		 ball = new GOval(ballStartX, ballStartY, 2 * BALL_RADIUS, 2 * BALL_RADIUS);
+		 ball = new GOval(ballStartX, ballStartY, BALL_RADIUS, BALL_RADIUS);
 		 ball.setFillColor(Color.BLACK);
 		 ball.setFilled(true);
 		 
 		 add(ball);
 		 
-		 GOval test = new GOval(paddleX, paddleY, BALL_RADIUS, BALL_RADIUS);
-		 test.setFillColor(Color.RED);
-		 test.setFilled(true);
-		 add(test);
+//		 GOval test = new GOval(paddleX, paddleY, BALL_RADIUS, BALL_RADIUS);
+//		 test.setFillColor(Color.RED);
+//		 test.setFilled(true);
+//		 add(test);
 	 }
 	 
 	 public void keyPressed( KeyEvent e ){
