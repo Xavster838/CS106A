@@ -55,7 +55,7 @@ import javax.crypto.KeyAgreement;
 	 private static final int BRICK_HEIGHT = 8;
 	 
 	/** Radius of the ball in pixels */
-	 private static final int BALL_RADIUS = 10;
+	 private static final int BALL_DIAMETER = 10;
 	 
 	/** Offset of the top brick row from the top */
 	 private static final int BRICK_Y_OFFSET = 70;
@@ -69,23 +69,45 @@ import javax.crypto.KeyAgreement;
 	 /**Number of rows per color */
 	 private static final int N_ROWS_PER_COLOR = NBRICK_ROWS / NCOLORS;
 	 
+	 /**X Speed of Paddle */
+	 private static final int PADDLE_X_VEL = 4;
+	 
+	 /**Delay time for simulation */
+	 private static final int DELAY = 50;
+	 
+	 private static final int BALL_Y_START_VEL = 4;
+	 
 	 public void run() {
 		 /* You fill this in, along with any subsidiary methods */
 		 setupGame();
 		 
-		 //addKeyListeners();
-		 //addMouseListeners();
+		 addKeyListeners();
+		 addMouseListeners();
+		 
+		 while(startGame){
+			 //moveBall( vx, vy);
+			 //checkCollission( ball.getX(), ball.getY() );
+			 pause(DELAY);
+			 
+		 }
 	 } 
  	
 	 
 	 private void setupGame(){
 		 //setBounds
-		 resize( new Dimension(APPLICATION_WIDTH, APPLICATION_HEIGHT));
+		 resize( new Dimension(WIDTH, HEIGHT));
 		 setBounds();
 		 setBricks();
 		 setPaddle();
 		 setBall();
+		 //addListeners
+		 //startGame();
+		 addKeyListeners();
+		 
+		 
 	 }
+
+// ===========================			Set Up			======================================== //
 	 /**
 	  * setBounds()
 	  * method encapsulating setting of walls of the game
@@ -203,32 +225,104 @@ import javax.crypto.KeyAgreement;
 		 int paddleX = (int) paddle.getX();
 		 int paddleY = (int) paddle.getY();
 		 //get x location of paddle (left most) and add half the width minus ball radius for ball point
-		 //note that you think ball_radius should be ball_diameter: need to see how GOval works
-		 int ballStartX = paddleX + ( (int) paddle.getWidth() )/2 - BALL_RADIUS / 2;
-		 int ballStartY = paddleY - (BALL_RADIUS);
+		 //note that you think BALL_DIAMETER should be ball_diameter: need to see how GOval works
+		 int ballStartX = paddleX + ( (int) paddle.getWidth() )/2 - BALL_DIAMETER / 2;
+		 int ballStartY = paddleY - (BALL_DIAMETER);
 		 
-		 ball = new GOval(ballStartX, ballStartY, BALL_RADIUS, BALL_RADIUS);
+		 ball = new GOval(ballStartX, ballStartY, BALL_DIAMETER, BALL_DIAMETER);
 		 ball.setFillColor(Color.BLACK);
 		 ball.setFilled(true);
 		 
 		 add(ball);
 		 
-//		 GOval test = new GOval(paddleX, paddleY, BALL_RADIUS, BALL_RADIUS);
-//		 test.setFillColor(Color.RED);
-//		 test.setFilled(true);
-//		 add(test);
+	 }
+
+	 private void startGame(){
+		 //set ball speed
+		 vx = rgen.nextDouble(1.0, 3.0);
+		 if (rgen.nextBoolean(0.5)) vx = -vx;
+		 vy = BALL_Y_START_VEL;
 	 }
 	 
-	 public void keyPressed( KeyEvent e ){
-		 keyPressed = e.getKeyChar();
-		 
+// ===========================			End Set Up			======================================== //
+
+	 
+// ===========================		Movement Implementation		================================ //
+	 private void movePaddle(){
+		 paddle.move(paddleDir, 0);
 	 }
+	 
+	 private void moveBall(){
+		 ball.move(vx, vy);
+	 }	 
+// ===========================	End Movement Implementation		================================ //
+	 
+// ===========================	 Interactive Implementation	 ===================================== //
+	
+	 /**
+	 * keyPressed()
+	 * keyboard listener implementation for controlling paddle direction
+	 * inputs to control direction: comma-key (<) and . key(>)
+	 * @override
+	 */
+	 public void keyPressed( KeyEvent e ){
+		 char curKey = e.getKeyChar();
+		 
+		 //start game when space pressed:
+		 if(curKey == ' ' & !startGame ){
+			 startGame = true;
+			 startGame();
+		 }
+		 
+		 System.out.println(curKey + " pressed.");
+		 paddleDir = getDir(curKey);
+		 System.out.println("dir give: " + paddleDir);
+		 movePaddle();
+	 }
+	 /**
+	  * keyReleased()
+	  * keyboard listener to bring paddle to stop once key has been released
+	  */
+	 public void keyReleased( KeyEvent e){
+		 char curKey = e.getKeyChar();
+		 
+		 System.out.println(curKey + " released.");
+		 paddleDir = 0;
+		 System.out.println("dir give: " + paddleDir);
+	 }
+
+	 /**
+	  * getDir()
+	  * encapsulation of getting direction of 
+	  * @param keyPressed
+	  * @return
+	  */
+	 private int getDir( char keyPressed ){
+		 //maybe this statement is unnecessary 
+		 keyPressed = Character.toUpperCase(keyPressed);
+		 switch( keyPressed ){
+			 case(','):
+				 return -(PADDLE_X_VEL);
+			 case('.'):
+				 return (PADDLE_X_VEL);
+			 default:
+				 return paddleDir;
+		 }
+	 }
+	 
+// ===========================	 End Interactive Implementation	 ===================================== //
+
+	 
 	 
 	 //instance variables
 	 GRect paddle;
 	 GOval ball;
+	 
 	 //for getting initial random x direction
 	 RandomGenerator rgen = RandomGenerator.getInstance();
-	 char keyPressed;
+	 int paddleDir;
+	 double vx;
+	 double vy;
+	 boolean startGame = false;
 
 }
