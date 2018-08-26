@@ -248,13 +248,37 @@ import javax.crypto.KeyAgreement;
 
 	 
 // ===========================		Movement Implementation		================================ //
+	 /*
+	  * movePaddle()
+	  * encapsulation for paddle movement
+	  */
 	 private void movePaddle(){
-		 paddle.move(paddleDir, 0);
+		 if( paddleInBounds() ){
+			 paddle.move(paddleDir, 0);
+		 }
 	 }
 	 
+	 /*
+	  * moveBall: 
+	  * Encapsulation for ball movement
+	  */
 	 private void moveBall(){
+		 
+		 //check bounds
+		 
+		 
 		 ball.move(vx, vy);
 	 }	 
+	 
+	 /*
+	  * paddInBounds:
+	  * checks if next move will be in bounds
+	  */
+	 private boolean paddleInBounds(){
+		 double nextMove = paddle.getX() + paddleDir;
+		 return ( nextMove < (WIDTH - PADDLE_WIDTH) & (nextMove > 0) );
+	 }
+	 
 // ===========================	End Movement Implementation		================================ //
 	 
 // ===========================	 Interactive Implementation	 ===================================== //
@@ -273,10 +297,9 @@ import javax.crypto.KeyAgreement;
 			 startGame = true;
 			 startGame();
 		 }
-		 
-		 System.out.println(curKey + " pressed.");
+		 //System.out.println(curKey + " pressed.");
 		 paddleDir = getDir(curKey);
-		 System.out.println("dir give: " + paddleDir);
+		 //System.out.println("dir give: " + paddleDir);
 		 movePaddle();
 	 }
 	 /**
@@ -286,9 +309,9 @@ import javax.crypto.KeyAgreement;
 	 public void keyReleased( KeyEvent e){
 		 char curKey = e.getKeyChar();
 		 
-		 System.out.println(curKey + " released.");
+		 //System.out.println(curKey + " released.");
 		 paddleDir = 0;
-		 System.out.println("dir give: " + paddleDir);
+		 //System.out.println("dir give: " + paddleDir);
 	 }
 
 	 /**
@@ -299,7 +322,7 @@ import javax.crypto.KeyAgreement;
 	  */
 	 private int getDir( char keyPressed ){
 		 //maybe this statement is unnecessary 
-		 keyPressed = Character.toUpperCase(keyPressed);
+		// keyPressed = Character.toUpperCase(keyPressed);
 		 switch( keyPressed ){
 			 case(','):
 				 return -(PADDLE_X_VEL);
