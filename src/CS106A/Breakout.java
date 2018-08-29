@@ -70,7 +70,7 @@ import javax.crypto.KeyAgreement;
 	 private static final int N_ROWS_PER_COLOR = NBRICK_ROWS / NCOLORS;
 	 
 	 /**X Speed of Paddle */
-	 private static final int PADDLE_X_VEL = 4;
+	 private static final int PADDLE_X_VEL = 7;
 	 
 	 /**Delay time for simulation */
 	 private static final int DELAY = 50;
@@ -80,34 +80,36 @@ import javax.crypto.KeyAgreement;
 	 public void run() {
 		 /* You fill this in, along with any subsidiary methods */
 		 setupGame();
-		 
 		 addKeyListeners();
 		 addMouseListeners();
-		 
-		 while(startGame){
-			 //moveBall( vx, vy);
-			 //checkCollission( ball.getX(), ball.getY() );
+		 while(!startGame){
 			 pause(DELAY);
-			 
+		 }
+		 while(startGame){
+			 moveBall();
+			 checkSetCollision();
+			 pause(DELAY);
 		 }
 	 } 
  	
-	 
+
+
+// ===========================			Set Up			======================================== //
+	 /**
+	  * setupGame
+	  * set up the bricks, the size of the board, the paddle, place the ball, add listeners.
+	  */
 	 private void setupGame(){
 		 //setBounds
 		 resize( new Dimension(WIDTH, HEIGHT));
+		 //have ball get made vist because allows other objects to be visible over ball for collision logic
 		 setBounds();
 		 setBricks();
 		 setPaddle();
 		 setBall();
-		 //addListeners
-		 //startGame();
-		 addKeyListeners();
-		 
+		 startGame();
 		 
 	 }
-
-// ===========================			Set Up			======================================== //
 	 /**
 	  * setBounds()
 	  * method encapsulating setting of walls of the game
@@ -166,9 +168,7 @@ import javax.crypto.KeyAgreement;
 	  * encapsulation of logic for figuring out the row color
 	  */
 	 private Color getRowColor( int row ){
-		 
 		 int curCase = row / N_ROWS_PER_COLOR;
-		 
 		 switch( curCase ){
 		 	case 0:
 		 		return Color.RED;
@@ -234,6 +234,9 @@ import javax.crypto.KeyAgreement;
 		 ball.setFilled(true);
 		 
 		 add(ball);
+		 //ensure ball goes in the back 
+		 //		so can catch things that are at a given ball point for collision detection
+		 ball.sendToBack();
 		 
 	 }
 
@@ -244,7 +247,11 @@ import javax.crypto.KeyAgreement;
 		 vy = BALL_Y_START_VEL;
 	 }
 	 
-// ===========================			End Set Up			======================================== //
+	 private void endGame(){
+		 
+	 }
+	 
+// ===========================			End Set Up / Set Down			=================================== //
 
 	 
 // ===========================		Movement Implementation		================================ //
@@ -256,6 +263,9 @@ import javax.crypto.KeyAgreement;
 		 if( paddleInBounds() ){
 			 paddle.move(paddleDir, 0);
 		 }
+		 //set to zero so automatically assumes stop moving if not pressing left or right
+		 // replaces keyEvent for releasing key
+		 paddleDir = 0;
 	 }
 	 
 	 /*
@@ -263,10 +273,6 @@ import javax.crypto.KeyAgreement;
 	  * Encapsulation for ball movement
 	  */
 	 private void moveBall(){
-		 
-		 //check bounds
-		 
-		 
 		 ball.move(vx, vy);
 	 }	 
 	 
@@ -279,6 +285,115 @@ import javax.crypto.KeyAgreement;
 		 return ( nextMove < (WIDTH - PADDLE_WIDTH) & (nextMove > 0) );
 	 }
 	 
+	 /*
+	  * checkSetBallBounce
+	  * checks if ball bouncing off of brick or wall and change direction accordingly.
+	  */
+//	 private void checkSetCollision(){
+//		 //wall logic
+//		 checkSetWallBounce();
+//		 //check hits a brick
+//		 checkSetBrickBounce();
+//	 }
+	 private void checkSetCollision(){
+		 double centerX = ball.getX() + (BALL_DIAMETER/2);
+		 double centerY = ball.getY() + (BALL_DIAMETER/2);
+		 if( checkTop(centerX) || checkBottom(centerY) ){
+			 vy = -(vy);
+		 }
+		 else if( checkRight(centerY) || checkLeft(centerY) ){
+			 vx = -(vx);
+		 }
+		 
+	 }
+	 
+	 private boolean checkTop( double ballXLoc ){
+		 double ballTop = ball.getY();
+		 //check if there's a brick there
+		 if( checkBrickBounce(ballXLoc, ballTop) ){
+			 //remove brick
+			 return true;
+		 }else if( ballTop <= 0 ){
+			 double diff = 0 - ballTop; //should be positive
+			 //move 2 times diff to simulate ball having bounced at wall
+			 ball.move(0, 2 * diff);
+			 return true;
+		 }
+		 return false;
+	 }
+	 
+	 private boolean checkBottom( double ballXLoc ){
+		 double ballBottom = ball.getY() + BALL_DIAMETER;
+		 if( checkBrickBounce(ballXLoc, ballBottom) ){
+			 //remove brick
+			 return true;
+		 }else if(ballBottom >= APPLICATION_HEIGHT){
+			 double diff = ballBottom - APPLICATION_HEIGHT;
+			 //move in negative direction and 2 times to simulate ball having bounced at wall
+			 ball.move(0, -(diff * 2)) ;
+			 return true;
+		 }
+		 return false;
+	 }
+	 private boolean checkRight( double ballYLoc ){
+		 double ballRight = ball.getX() + BALL_DIAMETER;
+		 if( checkBrickBounce(ballRight, ballYLoc) ){
+			 //remove brick
+			 return true;
+		 }else if( ballRight >= APPLICATION_WIDTH){
+			 double diff = ballRight - APPLICATION_WIDTH;
+			 ball.move( -(diff * 2), 0);
+			 return true;
+		 }
+		 return false;
+	 }
+	 private boolean checkLeft( double ballYLoc ){
+		 double ballLeft = ball.getX();
+		 if( checkBrickBounce(ballLeft, ballYLoc) ){
+			 //remove brick
+			 return true;
+		 }else if( ballLeft <= 0){
+			 double diff = 0 - ballLeft;//should be positive
+			 ball.move( diff * 2 , 0);
+			 return true;
+		 }
+		 return false;
+	 }
+	 /**
+	  * check if there is a brick residing at the location of interest. 
+	  * @param ballX
+	  * @param ballY
+	  */
+	 private boolean checkBrickBounce(double ballX , double ballY){
+		 /*
+		  * first check if it's in the y range of brick section
+		  * then check if there is a gRect that gets returned
+		  * POSSIBLE EDGE CASE: RUNNING INTO THE GRECT BORDER: resolved because border will not likely be the
+		  * 												   size of a brick width
+		  * 
+		  */
+		 boolean isBrick = false;
+		 //same logic as setting row except use NBRICK_ROWS for curRow and add extra brickHeight to get bottom
+		 double bottomBrickY = BRICK_Y_OFFSET + 
+				 ( NBRICK_ROWS *  (BRICK_HEIGHT + BRICK_SEP) ) + 
+				 BRICK_HEIGHT;
+		 
+		 if( ballY <= bottomBrickY){
+			 GObject bounceObject = getElementAt(ballX, ballY);
+			 if(!(bounceObject == null) ){
+				 isBrick = ( bounceObject.getWidth() == BRICK_WIDTH && bounceObject.isVisible() );
+			 }
+		 }
+		 return isBrick;
+	 }
+	 /**
+	  * remove brick from point spotX, spotY
+	  * @param ballX
+	  * @param ballY
+	  */
+	 private void removeBrick(double spotX , double spotY){
+		 
+	 }
 // ===========================	End Movement Implementation		================================ //
 	 
 // ===========================	 Interactive Implementation	 ===================================== //
@@ -297,22 +412,25 @@ import javax.crypto.KeyAgreement;
 			 startGame = true;
 			 startGame();
 		 }
-		 //System.out.println(curKey + " pressed.");
+		 System.out.println(curKey + " pressed.");
+		 System.out.println(startGame);
 		 paddleDir = getDir(curKey);
 		 //System.out.println("dir give: " + paddleDir);
 		 movePaddle();
 	 }
-	 /**
-	  * keyReleased()
-	  * keyboard listener to bring paddle to stop once key has been released
-	  */
-	 public void keyReleased( KeyEvent e){
-		 char curKey = e.getKeyChar();
-		 
-		 //System.out.println(curKey + " released.");
-		 paddleDir = 0;
-		 //System.out.println("dir give: " + paddleDir);
-	 }
+	 
+	 // gotten rid of because can do something with one line of code in the movePaddle() method
+//	 /**
+//	  * keyReleased()
+//	  * keyboard listener to bring paddle to stop once key has been released
+//	  */
+////	 public void keyReleased( KeyEvent e){
+////		 char curKey = e.getKeyChar();
+////		 
+////		 //System.out.println(curKey + " released.");
+////		 paddleDir = 0;
+////		 //System.out.println("dir give: " + paddleDir);
+////	 }
 
 	 /**
 	  * getDir()
@@ -332,6 +450,7 @@ import javax.crypto.KeyAgreement;
 				 return paddleDir;
 		 }
 	 }
+	 
 	 
 // ===========================	 End Interactive Implementation	 ===================================== //
 
